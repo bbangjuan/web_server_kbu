@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>자율주행 자동차 - AI카</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <span class="logo-icon">🚗</span>
+                <span class="logo-text">AI카</span>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="#home">홈</a></li>
+                <li><a href="#what">자율주행이란</a></li>
+                <li><a href="#how">작동 원리</a></li>
+                <li><a href="#levels">레벨</a></li>
+                <li><a href="#benefits">장점</a></li>
+                <li><a href="#safety">주의사항</a></li>
+                <li><a href="#future">미래</a></li>
+                <li><a href="forum.html">💬 게시판</a></li>
+            </ul>
+            <div class="nav-actions">
+                <a href="auth.html" class="nav-btn login-btn">로그인</a>
+                <span id="user-status" style="display: none;">
+                    <span id="current-user" style="margin-right: 10px; color: #2563eb; font-weight: 600;"></span>
+                    <button class="nav-btn logout-btn" onclick="handleLogout()">로그아웃</button>
+                </span>
+            </div>
+            <div class="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="home" class="hero">
+        <div class="hero-content">
+            <h1 class="hero-title">자율주행 자동차의<br>미래를 만나다</h1>
+            <p class="hero-subtitle">AI 기술이 만드는 스마트한 이동 혁명</p>
+            <button class="cta-button" onclick="scrollToSection('what')">시작하기</button>
+        </div>
+        <div class="hero-animation">
+            <div class="road">
+                <div class="car-animation">🚗</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- What is Autonomous Car -->
+    <section id="what" class="section">
+        <div class="container">
+            <h2 class="section-title">자율주행 자동차란?</h2>
+            <div class="content-grid">
+                <div class="content-card">
+                    <div class="card-icon">🤖</div>
+                    <h3>인공지능 운전</h3>
+                    <p>드라이버의 조작 없이 자체적으로 주변 환경을 인식하고, 경로를 계획하며, 차량을 운전하는 자동차입니다. 다양한 센서와 AI 기술을 활용하여 안전하고 효율적인 주행을 실현합니다.</p>
+                </div>
+                <div class="content-card">
+                    <div class="card-icon">👁️</div>
+                    <h3>360도 인식</h3>
+                    <p>라이더, 카메라, 레이더 등 다양한 센서를 통해 주변 환경을 실시간으로 감지하고 분석합니다. 다른 차량, 보행자, 장애물 등을 정확하게 인식하여 안전하게 대응합니다.</p>
+                </div>
+                <div class="content-card">
+                    <div class="card-icon">🧠</div>
+                    <h3>지능형 의사결정</h3>
+                    <p>수집된 데이터를 AI 알고리즘으로 분석하여 최적의 주행 경로와 속도를 결정합니다. 예측 모델링을 통해 잠재적 위험을 사전에 감지하고 회피합니다.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works -->
+    <section id="how" class="section dark">
+        <div class="container">
+            <h2 class="section-title">작동 원리</h2>
+            <div class="timeline">
+                <div class="timeline-item">
+                    <div class="timeline-number">1</div>
+                    <div class="timeline-content">
+                        <h3>감지 (Perception)</h3>
+                        <p>라이더(LiDAR), 카메라, 레이더 등 다양한 센서가 주변 환경의 3D 지도를 생성하고, 차량, 보행자, 신호등, 도로 표시 등을 실시간으로 감지합니다.</p>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-number">2</div>
+                    <div class="timeline-content">
+                        <h3>인식 (Localization)</h3>
+                        <p>GPS와 센서 데이터를 결합하여 차량의 정확한 위치를 파악합니다. HD 맵(고정밀 지도)과 비교하여 센티미터 단위의 정확한 위치를 계산합니다.</p>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-number">3</div>
+                    <div class="timeline-content">
+                        <h3>예측 (Prediction)</h3>
+                        <p>다른 차량과 보행자의 움직임을 예측하여 잠재적 충돌 지점을 파악합니다. 머신러닝 모델을 사용하여 행동 패턴을 학습하고 미래 궤적을 예측합니다.</p>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-number">4</div>
+                    <div class="timeline-content">
+                        <h3>계획 (Planning)</h3>
+                        <p>목적지를 향한 최적의 경로를 계획하고, 우선순위에 따라 여러 경로 옵션을 생성합니다. 트래픽, 교통 규칙, 안전성을 종합적으로 고려합니다.</p>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-number">5</div>
+                    <div class="timeline-content">
+                        <h3>제어 (Control)</h3>
+                        <p>경로 계획에 따라 핸들, 가속, 브레이크를 조작하여 차량을 안전하게 운전합니다. 부드러운 가속과 감속으로 승차감을 향상시킵니다.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Autonomy Levels -->
+    <section id="levels" class="section">
+        <div class="container">
+            <h2 class="section-title">자율주행 레벨</h2>
+            <div class="levels-grid">
+                <div class="level-card">
+                    <div class="level-badge level-0">레벨 0</div>
+                    <h3>수동 운전</h3>
+                    <p>드라이버가 모든 조작을 담당합니다. 자율주행 기능이 없는 전통적인 자동차입니다.</p>
+                </div>
+                <div class="level-card">
+                    <div class="level-badge level-1">레벨 1</div>
+                    <h3>주행 보조</h3>
+                    <p>개별 기능 보조 (예: 적응형 크루즈 컨트롤 또는 차선 유지). 드라이버가 대부분의 제어를 담당합니다.</p>
+                </div>
+                <div class="level-card">
+                    <div class="level-badge level-2">레벨 2</div>
+                    <h3>부분 자율주행</h3>
+                    <p>여러 기능 동시 작동 (예: 차선 유지 + 적응형 크루즈). 드라이버는 항상 대기해야 합니다.</p>
+                </div>
+                <div class="level-card">
+                    <div class="level-badge level-3">레벨 3</div>
+                    <h3>조건부 자율주행</h3>
+                    <p>특정 상황에서 자율주행 모드 작동. 드라이버는 요청 시 즉시 제어를 받아야 합니다.</p>
+                </div>
+                <div class="level-card">
+                    <div class="level-badge level-4">레벨 4</div>
+                    <h3>고도 자율주행</h3>
+                    <p>대부분의 상황에서 완전 자율주행. 제한된 지역이나 조건 하에서 작동합니다.</p>
+                </div>
+                <div class="level-card">
+                    <div class="level-badge level-5">레벨 5</div>
+                    <h3>완전 자율주행</h3>
+                    <p>모든 조건과 지역에서 완전 자율주행. 드라이버 개입이 필요 없습니다.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Benefits -->
+    <section id="benefits" class="section dark">
+        <div class="container">
+            <h2 class="section-title">자율주행의 혜택</h2>
+            <div class="benefits-grid">
+                <div class="benefit-card">
+                    <div class="benefit-icon">🛡️</div>
+                    <h3>안전성 향상</h3>
+                    <p>휴면, 음주, 주의산만 등 인간의 오류로 인한 교통사고를 크게 줄일 수 있습니다. 24시간 집중력을 유지하는 AI는 더 안전한 운전을 보장합니다.</p>
+                </div>
+                <div class="benefit-card">
+                    <div class="benefit-icon">♿</div>
+                    <h3>이동성 증가</h3>
+                    <p>노인, 장애인 등 운전할 수 없는 사람들에게도 이동의 자유를 제공합니다. 직접 운전이 불가능한 사람들도 자유롭게 이동할 수 있습니다.</p>
+                </div>
+                <div class="benefit-card">
+                    <div class="benefit-icon">🌱</div>
+                    <h3>환경 개선</h3>
+                    <p>최적의 경로와 속도 제어로 연료 소비를 줄이고, 전기 자율주행 차량을 통한 탄소 배출 감소가 기대됩니다.</p>
+                </div>
+                <div class="benefit-card">
+                    <div class="benefit-icon">⏰</div>
+                    <h3>시간 절약</h3>
+                    <p>운전 중 업무를 처리하거나 휴식을 취할 수 있어 생산성과 삶의 질이 향상됩니다. 이동 시간이 더욱 가치 있게 활용됩니다.</p>
+                </div>
+                <div class="benefit-card">
+                    <div class="benefit-icon">🚦</div>
+                    <h3>교통 혼잡 완화</h3>
+                    <p>차량 간 통신을 통한 협조 주행으로 교통 흐름이 원활해지고, 신호 대기 시간을 최소화합니다.</p>
+                </div>
+                <div class="benefit-card">
+                    <div class="benefit-icon">💰</div>
+                    <h3>비용 절감</h3>
+                    <p>차량 공유 서비스와 자가 소유의 불필요성으로 주차 공간과 차량 유지비를 절감할 수 있습니다.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Safety Guidelines -->
+    <section id="safety" class="section">
+        <div class="container">
+            <h2 class="section-title">이용 시 주의사항</h2>
+            <div class="safety-grid">
+                <div class="safety-card warning">
+                    <div class="safety-icon">⚠️</div>
+                    <h3>항상 대기 상태 유지</h3>
+                    <p>자율주행 차량을 이용할 때는 반드시 운전석에 앉아 항상 주변 상황을 주시해야 합니다. 특히 레벨 2-3 수준의 자율주행에서는 예기치 못한 상황에 즉시 대응할 수 있도록 준비해야 합니다.</p>
+                </div>
+                <div class="safety-card warning">
+                    <div class="safety-icon">📱</div>
+                    <h3>집중력 유지</h3>
+                    <p>자율주행이 활성화된 상태라도 스마트폰이나 다른 기기에 지나치게 집중하지 마세요. 시스템이 갑작스럽게 제어권을 넘겨줄 때 빠르게 대응할 수 있어야 합니다.</p>
+                </div>
+                <div class="safety-card warning">
+                    <div class="safety-icon">🌧️</div>
+                    <h3>날씨에 주의</h3>
+                    <p>강우, 강설, 안개 등 악천후에서는 센서 성능이 저하될 수 있습니다. 센서가 주변을 정확하게 인식하지 못할 수 있으므로 날씨가 나쁠 때는 자율주행 기능 사용을 삼가하거나 더욱 주의해야 합니다.</p>
+                </div>
+                <div class="safety-card warning">
+                    <div class="safety-icon">🛣️</div>
+                    <h3>도로 조건 확인</h3>
+                    <p>공사 중인 도로, 노면 표시가 불분명한 곳, 좁은 도로 등에서는 자율주행 기능이 제대로 작동하지 않을 수 있습니다. 이런 상황에서는 수동 조작이 필요합니다.</p>
+                </div>
+                <div class="safety-card warning">
+                    <div class="safety-icon">🔋</div>
+                    <h3>시스템 업데이트</h3>
+                    <p>정기적으로 차량의 소프트웨어를 업데이트하여 최신 안전 기능과 개선사항을 적용하세요. 오래된 버전은 보안 및 안전 취약점을 가질 수 있습니다.</p>
+                </div>
+                <div class="safety-card warning">
+                    <div class="safety-icon">👶</div>
+                    <h3>아동 안전</h3>
+                    <p>자율주행 기능이 켜져 있어도 항상 승객의 안전을 확인하세요. 특히 어린이를 태우는 경우 자율주행 기능만 믿기보다 직접 상황을 모니터링하는 것이 중요합니다.</p>
+                </div>
+                <div class="safety-card warning">
+                    <div class="safety-icon">⚡</div>
+                    <h3>위험한 운전 금지</h3>
+                    <p>자율주행 모드에서 운전하지 않아도 되는 것이라고 생각해 과속하거나 무단변경 등의 위험한 운전을 하지 마세요. 여전히 승객과 다른 차량의 안전을 위해 책임감 있는 태도가 필요합니다.</p>
+                </div>
+                <div class="safety-card warning">
+                    <div class="safety-icon">🔧</div>
+                    <h3>정기 점검</h3>
+                    <p>라이더, 카메라, 레이더 등 자율주행을 위한 센서는 정기적으로 청소하고 점검해야 합니다. 먼지나 손상된 센서는 치명적인 오판을 일으킬 수 있습니다.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Future -->
+    <section id="future" class="section">
+        <div class="container">
+            <h2 class="section-title">미래 전망</h2>
+            <div class="future-content">
+                <div class="future-text">
+                    <h3>자율주행의 미래</h3>
+                    <p>자율주행 자동차 기술은 빠르게 발전하고 있으며, 2030년대에는 완전 자율주행 차량이 도로를 달리는 모습을 볼 수 있을 것으로 예상됩니다.</p>
+                    <p>주요 기술 혁신:</p>
+                    <ul>
+                        <li><strong>AI 발전</strong>: 딥러닝과 강화학습을 통한 의사결정 능력 향상</li>
+                        <li><strong>센서 기술</strong>: 비용 감소와 성능 향상으로 대중화 가속</li>
+                        <li><strong>5G/6G 네트워크</strong>: 초저지연 차량 간 통신으로 협조 주행 실현</li>
+                        <li><strong>규제 정비</strong>: 법적 프레임워크 구축으로 시장 성숙도 향상</li>
+                    </ul>
+                    <p>자율주행 자동차는 단순한 이동 수단을 넘어 새로운 생활 공간과 서비스의 플랫폼이 될 것입니다. 오늘의 혁신이 내일의 일상을 만들어갑니다.</p>
+                </div>
+                <div class="future-stats">
+                    <div class="stat-card">
+                        <div class="stat-number">90%</div>
+                        <div class="stat-label">사고 감소 예상</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">20%</div>
+                        <div class="stat-label">에너지 효율 향상</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">1조</div>
+                        <div class="stat-label">시장 규모 (2030년, 달러)</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">50%</div>
+                        <div class="stat-label">교통 혼잡 감소</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>🚗 AI카</h3>
+                    <p>자율주행 자동차의 현재와 미래를 소개합니다.</p>
+                </div>
+                <div class="footer-section">
+                    <h4>빠른 링크</h4>
+                    <ul>
+                        <li><a href="#home">홈</a></li>
+                        <li><a href="#what">자율주행이란</a></li>
+                        <li><a href="#how">작동 원리</a></li>
+                        <li><a href="#levels">레벨</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>정보</h4>
+                    <ul>
+                        <li><a href="#benefits">장점</a></li>
+                        <li><a href="#safety">주의사항</a></li>
+                        <li><a href="#future">미래</a></li>
+                        <li><a href="#">뉴스</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 AI카. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+    <script>
+        // 사용자 인증 상태 확인
+        async function checkAuth() {
+            try {
+                const response = await fetch('/api/user');
+                const data = await response.json();
+                
+                if (data.loggedIn) {
+                    document.querySelector('.login-btn').parentElement.style.display = 'none';
+                    document.getElementById('user-status').style.display = 'block';
+                    document.getElementById('current-user').textContent = data.username + '님';
+                }
+            } catch (error) {
+                console.log('인증 확인 중 오류:', error);
+            }
+        }
+
+        // 로그아웃 처리
+        async function handleLogout() {
+            try {
+                await fetch('/api/logout', { method: 'POST' });
+                location.reload();
+            } catch (error) {
+                console.log('로그아웃 중 오류:', error);
+            }
+        }
+
+        // 페이지 로드 시 실행
+        checkAuth();
+    </script>
+</body>
+</html>
+

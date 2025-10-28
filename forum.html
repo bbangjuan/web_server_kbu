@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>커뮤니티 게시판 - AI카</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        .forum-container {
+            max-width: 1200px;
+            margin: 80px auto 50px;
+            padding: 20px;
+        }
+        .forum-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        .forum-header h1 {
+            font-size: 2.5rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .user-name {
+            font-weight: 600;
+            color: #2563eb;
+        }
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+        .btn-secondary {
+            background: #e5e7eb;
+            color: #374151;
+        }
+        .btn-secondary:hover {
+            background: #d1d5db;
+        }
+        .post-list {
+            display: grid;
+            gap: 20px;
+        }
+        .post-card {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .post-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        }
+        .post-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+        .post-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #1e293b;
+        }
+        .post-author {
+            color: #64748b;
+            font-size: 0.9rem;
+        }
+        .post-content {
+            color: #475569;
+            line-height: 1.6;
+            margin-bottom: 15px;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        .post-footer {
+            display: flex;
+            justify-content: space-between;
+            color: #94a3b8;
+            font-size: 0.9rem;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            overflow-y: auto;
+        }
+        .modal.active {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 50px 20px;
+        }
+        .modal-content {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 800px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        .modal-title {
+            font-size: 2rem;
+            font-weight: 700;
+        }
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 2rem;
+            cursor: pointer;
+            color: #64748b;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #374151;
+        }
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            font-size: 16px;
+            font-family: inherit;
+            transition: border-color 0.3s ease;
+        }
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #2563eb;
+        }
+        .form-group textarea {
+            min-height: 200px;
+            resize: vertical;
+        }
+        .comments-section {
+            margin-top: 30px;
+            border-top: 2px solid #e5e7eb;
+            padding-top: 30px;
+        }
+        .comment-form {
+            margin-bottom: 30px;
+        }
+        .comments-list {
+            display: grid;
+            gap: 20px;
+        }
+        .comment-card {
+            background: #f8fafc;
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 4px solid #2563eb;
+        }
+        .comment-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        .comment-author {
+            font-weight: 600;
+            color: #2563eb;
+        }
+        .comment-date {
+            color: #94a3b8;
+            font-size: 0.9rem;
+        }
+        .comment-content {
+            color: #475569;
+            line-height: 1.6;
+        }
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #94a3b8;
+        }
+        .empty-state-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar" style="position: relative;">
+        <div class="nav-container">
+            <div class="logo">
+                <span class="logo-icon">🚗</span>
+                <span class="logo-text">AI카</span>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="index.html">홈</a></li>
+                <li><a href="index.html#what">자율주행이란</a></li>
+                <li><a href="index.html#levels">레벨</a></li>
+                <li><a href="index.html#benefits">장점</a></li>
+                <li><a href="forum.html">게시판</a></li>
+            </ul>
+            <div class="user-info">
+                <span id="user-name" class="user-name"></span>
+                <button class="btn btn-secondary" onclick="logout()">로그아웃</button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="forum-container">
+        <div class="forum-header">
+            <h1>💬 커뮤니티 게시판</h1>
+            <button class="btn btn-primary" onclick="openPostModal()">새 글 작성</button>
+        </div>
+
+        <div id="post-list" class="post-list">
+            <!-- 게시글 목록 -->
+        </div>
+    </div>
+
+    <!-- 게시글 작성 모달 -->
+    <div id="post-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">새 글 작성</h2>
+                <button class="close-btn" onclick="closePostModal()">&times;</button>
+            </div>
+            <div class="form-group">
+                <label for="post-title">제목</label>
+                <input type="text" id="post-title" placeholder="제목을 입력하세요">
+            </div>
+            <div class="form-group">
+                <label for="post-content">내용</label>
+                <textarea id="post-content" placeholder="내용을 입력하세요"></textarea>
+            </div>
+            <button class="btn btn-primary" style="width: 100%;" onclick="submitPost()">작성하기</button>
+        </div>
+    </div>
+
+    <!-- 게시글 상세 모달 -->
+    <div id="detail-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="detail-title" class="modal-title"></h2>
+                <button class="close-btn" onclick="closeDetailModal()">&times;</button>
+            </div>
+            <div id="detail-content" style="line-height: 1.8; color: #475569; margin-bottom: 20px;">
+                <!-- 게시글 내용 -->
+            </div>
+            <div id="detail-author" style="color: #64748b; border-bottom: 2px solid #e5e7eb; padding-bottom: 20px; margin-bottom: 20px;">
+                <!-- 작성자 정보 -->
+            </div>
+
+            <div class="comments-section">
+                <h3>댓글</h3>
+                <div class="comment-form">
+                    <div class="form-group">
+                        <textarea id="comment-content" placeholder="댓글을 입력하세요"></textarea>
+                    </div>
+                    <button class="btn btn-primary" onclick="submitComment()">댓글 작성</button>
+                </div>
+                <div id="comments-list" class="comments-list">
+                    <!-- 댓글 목록 -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentPostId = null;
+        let currentUser = null;
+
+        // 페이지 로드 시 사용자 정보 확인
+        async function checkAuth() {
+            try {
+                const response = await fetch('/api/user');
+                const data = await response.json();
+                
+                if (data.loggedIn) {
+                    currentUser = data;
+                    document.getElementById('user-name').textContent = data.username + '님';
+                    loadPosts();
+                } else {
+                    alert('로그인이 필요합니다.');
+                    window.location.href = 'auth.html';
+                }
+            } catch (error) {
+                console.error('인증 확인 실패:', error);
+                window.location.href = 'auth.html';
+            }
+        }
+
+        // 게시글 목록 로드
+        async function loadPosts() {
+            try {
+                const response = await fetch('/api/posts');
+                const posts = await response.json();
+                
+                const postList = document.getElementById('post-list');
+                if (posts.length === 0) {
+                    postList.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-state-icon">📭</div>
+                            <h3>아직 게시글이 없습니다</h3>
+                            <p>첫 번째 게시글을 작성해보세요!</p>
+                        </div>
+                    `;
+                } else {
+                    postList.innerHTML = posts.map(post => `
+                        <div class="post-card" onclick="viewPost(${post.id})">
+                            <div class="post-header">
+                                <div class="post-title">${post.title}</div>
+                                <div class="post-author">👤 ${post.username}</div>
+                            </div>
+                            <div class="post-content">${post.content}</div>
+                            <div class="post-footer">
+                                <span>${formatDate(post.created_at)}</span>
+                            </div>
+                        </div>
+                    `).join('');
+                }
+            } catch (error) {
+                console.error('게시글 로드 실패:', error);
+            }
+        }
+
+        // 게시글 상세 보기
+        async function viewPost(id) {
+            currentPostId = id;
+            try {
+                const [post, comments] = await Promise.all([
+                    fetch(`/api/posts/${id}`).then(r => r.json()),
+                    fetch(`/api/posts/${id}/comments`).then(r => r.json())
+                ]);
+
+                document.getElementById('detail-title').textContent = post.title;
+                document.getElementById('detail-content').textContent = post.content;
+                document.getElementById('detail-author').innerHTML = `
+                    작성자: <strong>${post.username}</strong> | 작성일: ${formatDate(post.created_at)}
+                `;
+                
+                renderComments(comments);
+                document.getElementById('detail-modal').classList.add('active');
+            } catch (error) {
+                console.error('게시글 로드 실패:', error);
+            }
+        }
+
+        // 댓글 렌더링
+        function renderComments(comments) {
+            const commentsList = document.getElementById('comments-list');
+            if (comments.length === 0) {
+                commentsList.innerHTML = '<p style="color: #94a3b8; text-align: center;">아직 댓글이 없습니다.</p>';
+            } else {
+                commentsList.innerHTML = comments.map(comment => `
+                    <div class="comment-card">
+                        <div class="comment-header">
+                            <div class="comment-author">👤 ${comment.username}</div>
+                            <div class="comment-date">${formatDate(comment.created_at)}</div>
+                        </div>
+                        <div class="comment-content">${comment.content}</div>
+                    </div>
+                `).join('');
+            }
+        }
+
+        // 게시글 작성 모달 열기
+        function openPostModal() {
+            document.getElementById('post-modal').classList.add('active');
+        }
+
+        // 게시글 작성 모달 닫기
+        function closePostModal() {
+            document.getElementById('post-modal').classList.remove('active');
+            document.getElementById('post-title').value = '';
+            document.getElementById('post-content').value = '';
+        }
+
+        // 게시글 상세 모달 닫기
+        function closeDetailModal() {
+            document.getElementById('detail-modal').classList.remove('active');
+            currentPostId = null;
+        }
+
+        // 게시글 작성
+        async function submitPost() {
+            const title = document.getElementById('post-title').value;
+            const content = document.getElementById('post-content').value;
+
+            if (!title || !content) {
+                alert('제목과 내용을 모두 입력해주세요.');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/posts', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ title, content })
+                });
+                const data = await response.json();
+
+                if (response.ok) {
+                    alert(data.message);
+                    closePostModal();
+                    loadPosts();
+                } else {
+                    alert(data.error);
+                }
+            } catch (error) {
+                alert('게시글 작성에 실패했습니다.');
+            }
+        }
+
+        // 댓글 작성
+        async function submitComment() {
+            const content = document.getElementById('comment-content').value;
+            
+            if (!content) {
+                alert('댓글 내용을 입력해주세요.');
+                return;
+            }
+
+            if (!currentPostId) return;
+
+            try {
+                const response = await fetch(`/api/posts/${currentPostId}/comments`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ content })
+                });
+                const data = await response.json();
+
+                if (response.ok) {
+                    document.getElementById('comment-content').value = '';
+                    viewPost(currentPostId);
+                } else {
+                    alert(data.error);
+                }
+            } catch (error) {
+                alert('댓글 작성에 실패했습니다.');
+            }
+        }
+
+        // 로그아웃
+        async function logout() {
+            try {
+                await fetch('/api/logout', { method: 'POST' });
+                window.location.href = 'auth.html';
+            } catch (error) {
+                console.error('로그아웃 실패:', error);
+            }
+        }
+
+        // 날짜 포맷
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('ko-KR', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+
+        // 모달 외부 클릭 시 닫기
+        window.onclick = function(event) {
+            const modals = document.querySelectorAll('.modal');
+            modals.forEach(modal => {
+                if (event.target === modal) {
+                    modal.classList.remove('active');
+                }
+            });
+        }
+
+        // 페이지 로드 시 실행
+        checkAuth();
+    </script>
+</body>
+</html>
+
