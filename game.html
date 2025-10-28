@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>자율주행 vs 수동조작 게임 - AI카</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Noto Sans KR', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .navbar {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 1rem 20px;
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #2563eb;
+        }
+        
+        .back-link {
+            color: #2563eb;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .back-link:hover {
+            transform: translateX(-5px);
+        }
+        
+        .game-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+        }
+        
+        .game-title {
+            font-size: 2.5rem;
+            color: white;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        
+        .game-description {
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 40px;
+            text-align: center;
+            font-size: 1.1rem;
+            max-width: 600px;
+        }
+        
+        .game-board {
+            width: 100%;
+            max-width: 800px;
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+        
+        .comparison-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .car-selection {
+            text-align: center;
+        }
+        
+        .car-icon {
+            font-size: 5rem;
+            margin-bottom: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            user-select: none;
+        }
+        
+        .car-icon:hover {
+            transform: scale(1.1);
+        }
+        
+        .car-icon.selected {
+            transform: scale(1.2);
+            filter: drop-shadow(0 10px 20px rgba(102, 126, 234, 0.5));
+        }
+        
+        .car-label {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: #1e293b;
+        }
+        
+        .car-description {
+            color: #64748b;
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+        
+        .controls {
+            margin-top: 30px;
+            text-align: center;
+        }
+        
+        .btn {
+            padding: 15px 40px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 5px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(102, 126, 234, 0.5);
+        }
+        
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .btn-secondary {
+            background: #e5e7eb;
+            color: #374151;
+        }
+        
+        .btn-secondary:hover {
+            background: #d1d5db;
+        }
+        
+        .statistics {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin-top: 30px;
+            padding-top: 30px;
+            border-top: 2px solid #e5e7eb;
+        }
+        
+        .stat-item {
+            background: #f8fafc;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            color: #64748b;
+            margin-bottom: 10px;
+        }
+        
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #2563eb;
+        }
+        
+        .result-message {
+            text-align: center;
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-top: 20px;
+            padding: 20px;
+            border-radius: 15px;
+            background: #f8fafc;
+        }
+        
+        .result-win {
+            background: #d1fae5;
+            color: #059669;
+        }
+        
+        .result-lose {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+        
+        @media (max-width: 768px) {
+            .game-title {
+                font-size: 2rem;
+            }
+            
+            .comparison-container {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .car-icon {
+                font-size: 4rem;
+            }
+            
+            .statistics {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">🚗 AI카 게임</div>
+            <a href="index.html" class="back-link">← 메인으로</a>
+        </div>
+    </nav>
+
+    <div class="game-container">
+        <h1 class="game-title">자율주행 vs 수동조작</h1>
+        <p class="game-description">
+            어떤 자동차가 더 효율적일까요?<br>
+            좌우 화살표 키를 사용하여 수동조작으로 운전하세요!
+        </p>
+
+        <div class="game-board">
+            <div class="comparison-container">
+                <div class="car-selection">
+                    <div class="car-label">🤖 자율주행 자동차</div>
+                    <div class="car-icon selected" data-car="autonomous">🚗</div>
+                    <div class="car-description">
+                        AI가 자동으로 운전합니다.<br>
+                        안전하고 효율적인 주행!
+                    </div>
+                </div>
+
+                <div class="car-selection">
+                    <div class="car-label">👤 수동조작 자동차</div>
+                    <div class="car-icon" data-car="manual">🚘</div>
+                    <div class="car-description">
+                        당신이 직접 운전합니다.<br>
+                        ←→ 키를 사용하세요!
+                    </div>
+                </div>
+            </div>
+
+            <div class="controls">
+                <button class="btn btn-primary" onclick="startGame()" id="startBtn">게임 시작</button>
+                <button class="btn btn-secondary" onclick="resetGame()" id="resetBtn" style="display: none;">다시 시작</button>
+            </div>
+
+            <div class="statistics" id="stats" style="display: none;">
+                <div class="stat-item">
+                    <div class="stat-label">자율주행</div>
+                    <div class="stat-value" id="auto-score">0</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">수동조작</div>
+                    <div class="stat-value" id="manual-score">0</div>
+                </div>
+            </div>
+
+            <div id="result" style="display: none;"></div>
+        </div>
+    </div>
+
+    <script>
+        let selectedCar = 'autonomous';
+        let gameStarted = false;
+        let autoScore = 0;
+        let manualScore = 0;
+        let gameInterval = null;
+
+        // 자동차 선택
+        document.querySelectorAll('.car-icon').forEach(icon => {
+            icon.addEventListener('click', () => {
+                document.querySelectorAll('.car-icon').forEach(i => i.classList.remove('selected'));
+                icon.classList.add('selected');
+                selectedCar = icon.dataset.car;
+            });
+        });
+
+        function startGame() {
+            gameStarted = true;
+            document.getElementById('startBtn').style.display = 'none';
+            document.getElementById('resetBtn').style.display = 'inline-block';
+            document.getElementById('stats').style.display = 'grid';
+            
+            // 자율주행 차량은 자동으로 점수 획득
+            gameInterval = setInterval(() => {
+                autoScore += Math.floor(Math.random() * 5) + 3;
+                document.getElementById('auto-score').textContent = autoScore;
+                
+                if (autoScore >= 100) {
+                    endGame('autonomous');
+                }
+            }, 1000);
+        }
+
+        function resetGame() {
+            gameStarted = false;
+            autoScore = 0;
+            manualScore = 0;
+            document.getElementById('auto-score').textContent = '0';
+            document.getElementById('manual-score').textContent = '0';
+            document.getElementById('startBtn').style.display = 'inline-block';
+            document.getElementById('resetBtn').style.display = 'none';
+            document.getElementById('result').style.display = 'none';
+            
+            if (gameInterval) {
+                clearInterval(gameInterval);
+                gameInterval = null;
+            }
+        }
+
+        function endGame(winner) {
+            clearInterval(gameInterval);
+            gameStarted = false;
+            
+            const resultDiv = document.getElementById('result');
+            resultDiv.style.display = 'block';
+            
+            if (winner === 'autonomous') {
+                resultDiv.className = 'result-message result-win';
+                resultDiv.innerHTML = '🤖 자율주행 자동차 승리!<br>AI가 더 효율적입니다!';
+            } else if (winner === 'manual') {
+                resultDiv.className = 'result-message result-win';
+                resultDiv.innerHTML = '👤 수동조작 자동차 승리!<br>당신의 실력이 뛰어납니다!';
+            }
+        }
+
+        // 키보드 이벤트
+        document.addEventListener('keydown', (e) => {
+            if (!gameStarted) return;
+            
+            if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+                manualScore += Math.floor(Math.random() * 8) + 5;
+                document.getElementById('manual-score').textContent = manualScore;
+                
+                // 승리 조건
+                if (manualScore >= 100) {
+                    endGame('manual');
+                }
+                
+                // 자율주행보다 앞서면 승리 가능
+                if (manualScore > autoScore && manualScore >= 80) {
+                    const random = Math.random();
+                    if (random > 0.7) {
+                        endGame('manual');
+                    }
+                }
+            }
+        });
+
+        // 모바일 터치 제어
+        let touchStartX = 0;
+        let touchEndX = 0;
+
+        document.addEventListener('touchstart', (e) => {
+            if (!gameStarted) return;
+            touchStartX = e.changedTouches[0].screenX;
+        });
+
+        document.addEventListener('touchend', (e) => {
+            if (!gameStarted) return;
+            touchEndX = e.changedTouches[0].screenX;
+            handleSwipe();
+        });
+
+        function handleSwipe() {
+            if (Math.abs(touchStartX - touchEndX) > 30) {
+                manualScore += Math.floor(Math.random() * 8) + 5;
+                document.getElementById('manual-score').textContent = manualScore;
+                
+                if (manualScore >= 100) {
+                    endGame('manual');
+                }
+            }
+        }
+    </script>
+</body>
+</html>
+
