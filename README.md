@@ -129,8 +129,9 @@ Aicar/
 
 - **프론트엔드**: HTML, CSS, JavaScript
 - **백엔드**: Node.js, Express
-- **데이터베이스**: MySQL (mysql2)
+- **데이터베이스**: PostgreSQL (로컬/릴리스) + MySQL (옵션)
 - **인증**: Session 기반 인증, bcryptjs 비밀번호 해싱
+- **배포**: Render.com
 
 ## API 엔드포인트
 

@@ -174,9 +174,9 @@ app.get('/api/posts/:id/comments', async (req, res) => {
     }
 });
 
-// 서버 시작
-app.listen(PORT, () => {
+// 서버 시작 (Render 호환)
+const server = app.listen(PORT, '0.0.0.0', () => {
     console.log(`🚀 서버가 포트 ${PORT}에서 실행 중입니다.`);
     console.log(`📡 http://localhost:${PORT}`);
-    console.log(`💾 MySQL 데이터베이스 연결 대기 중...`);
+    console.log(`💾 PostgreSQL 데이터베이스 연결 대기 중...`);
 });

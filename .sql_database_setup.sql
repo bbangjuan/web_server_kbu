@@ -53,3 +53,4 @@ CREATE INDEX idx_comments_user_id ON comments(user_id);
 -- 완료 메시지
 SELECT '✅ 데이터베이스 설정이 완료되었습니다!' AS message;
 
+
