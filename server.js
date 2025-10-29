@@ -51,11 +51,32 @@ app.post('/api/register', async (req, res) => {
         await userModel.createUser(username, email, password);
         res.json({ success: true, message: '회원가입이 완료되었습니다.' });
     } catch (error) {
-        if (error.code === '23505') { // PostgreSQL unique constraint violation
+        // PostgreSQL 에러 코드 처리
+        if (error.code === '23505') { // unique constraint violation
             return res.status(400).json({ error: '이미 존재하는 사용자명 또는 이메일입니다.' });
         }
+        if (error.code === '42P01') { // table does not exist
+            return res.status(503).json({ error: '데이터베이스 테이블이 아직 준비되지 않았습니다. 잠시 후 다시 시도해주세요.' });
+        }
+        if (error.code === 'ECONNREFUSED' || error.code === 'ENOTFOUND') {
+            return res.status(503).json({ error: '데이터베이스에 연결할 수 없습니다. 데이터베이스 설정을 확인해주세요.' });
+        }
+        if (error.code === '28P01') { // invalid password
+            return res.status(503).json({ error: '데이터베이스 인증 오류가 발생했습니다. 데이터베이스 설정을 확인해주세요.' });
+        }
+        if (error.code === '3D000') { // database does not exist
+            return res.status(503).json({ error: '데이터베이스를 찾을 수 없습니다. 데이터베이스 이름을 확인해주세요.' });
+        }
+        
+        // 다른 에러들
         console.error('회원가입 오류:', error);
-        res.status(500).json({ error: '서버 오류가 발생했습니다.' });
+        console.error('에러 코드:', error.code);
+        console.error('에러 메시지:', error.message);
+        console.error('에러 스택:', error.stack);
+        
+        // 에러 메시지에 데이터베이스 관련 정보가 포함되어 있으면 그대로 반환
+        const errorMessage = error.message || '서버 오류가 발생했습니다.';
+        res.status(500).json({ error: errorMessage });
     }
 });
 

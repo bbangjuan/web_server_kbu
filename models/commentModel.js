@@ -1,4 +1,4 @@
-const pool = require('../config/db');
+const { pool } = require('../config/db');
 
 // 댓글 작성
 async function createComment(postId, userId, username, content) {

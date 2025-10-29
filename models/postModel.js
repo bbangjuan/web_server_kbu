@@ -1,4 +1,4 @@
-const pool = require('../config/db');
+const { pool } = require('../config/db');
 
 // 게시글 작성
 async function createPost(userId, username, title, content) {

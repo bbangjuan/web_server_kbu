@@ -1,16 +1,27 @@
-const pool = require('../config/db');
+const { pool, ensureTablesReady } = require('../config/db');
 
 // 회원가입
 async function createUser(username, email, password) {
+    // 테이블이 준비될 때까지 대기
+    const ready = await ensureTablesReady();
+    if (!ready) {
+        throw new Error('데이터베이스 테이블이 아직 준비되지 않았습니다. 잠시 후 다시 시도해주세요.');
+    }
+    
     const bcrypt = require('bcryptjs');
     const hashedPassword = await bcrypt.hash(password, 10);
     
-    const result = await pool.query(
-        'INSERT INTO users (username, email, password) VALUES ($1, $2, $3) RETURNING id',
-        [username, email, hashedPassword]
-    );
-    
-    return result.rows[0].id;
+    try {
+        const result = await pool.query(
+            'INSERT INTO users (username, email, password) VALUES ($1, $2, $3) RETURNING id',
+            [username, email, hashedPassword]
+        );
+        
+        return result.rows[0].id;
+    } catch (error) {
+        // 에러를 다시 던져서 상위에서 처리하도록
+        throw error;
+    }
 }
 
 // 사용자명으로 사용자 조회
