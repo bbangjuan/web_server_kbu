@@ -137,8 +137,31 @@ async function initTables() {
 }
 
 // 서버 시작 시 즉시 테이블 초기화 시도
-initTables().catch(err => {
-    console.error('테이블 초기화 실패:', err);
+let initTablesPromise = null;
+
+async function initializeTables() {
+    if (initTablesPromise) {
+        return initTablesPromise;
+    }
+    
+    initTablesPromise = (async () => {
+        try {
+            await initTables();
+        } catch (err) {
+            console.error('테이블 초기화 실패:', err);
+            // 실패해도 계속 시도할 수 있도록 플래그 리셋
+            initTablesPromise = null;
+            throw err;
+        }
+        return tablesReady;
+    })();
+    
+    return initTablesPromise;
+}
+
+// 서버 시작 시 즉시 테이블 초기화
+initializeTables().catch(() => {
+    // 에러는 이미 initTables에서 로그되었음
 });
 
 // 테이블 준비 상태 확인 함수
@@ -151,26 +174,83 @@ async function ensureTablesReady() {
         if (tablesReady) return true;
     }
     
-    // 여전히 준비되지 않았다면 테이블 존재 여부 직접 확인
+    // 여전히 준비되지 않았다면 테이블 존재 여부 직접 확인 및 생성 시도
     try {
+        // 먼저 테이블 존재 확인
         const result = await pool.query(`
             SELECT EXISTS (
                 SELECT FROM information_schema.tables 
-                WHERE table_name = 'users'
+                WHERE table_schema = 'public' 
+                AND table_name = 'users'
             );
         `);
         const tableExists = result.rows[0].exists;
         
         if (tableExists) {
-            console.log('⚠️ 테이블은 존재하지만 플래그가 설정되지 않았습니다. 플래그를 업데이트합니다.');
+            console.log('✅ users 테이블이 존재합니다. 플래그를 업데이트합니다.');
             tablesReady = true;
             return true;
         } else {
-            console.error('❌ users 테이블이 존재하지 않습니다.');
-            return false;
+            console.log('⚠️ users 테이블이 존재하지 않습니다. 테이블을 생성합니다...');
+            // 테이블이 없으면 직접 생성 시도
+            try {
+                // initTables 함수 직접 실행
+                await pool.query(`
+                    CREATE TABLE IF NOT EXISTS users (
+                        id SERIAL PRIMARY KEY,
+                        username VARCHAR(50) UNIQUE NOT NULL,
+                        email VARCHAR(100) UNIQUE NOT NULL,
+                        password VARCHAR(255) NOT NULL,
+                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                    )
+                `);
+                
+                await pool.query(`
+                    CREATE TABLE IF NOT EXISTS posts (
+                        id SERIAL PRIMARY KEY,
+                        user_id INTEGER NOT NULL,
+                        username VARCHAR(50) NOT NULL,
+                        title VARCHAR(200) NOT NULL,
+                        content TEXT NOT NULL,
+                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+                    )
+                `);
+                
+                await pool.query(`
+                    CREATE TABLE IF NOT EXISTS comments (
+                        id SERIAL PRIMARY KEY,
+                        post_id INTEGER NOT NULL,
+                        user_id INTEGER NOT NULL,
+                        username VARCHAR(50) NOT NULL,
+                        content TEXT NOT NULL,
+                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                        FOREIGN KEY (post_id) REFERENCES posts(id) ON DELETE CASCADE,
+                        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+                    )
+                `);
+                
+                console.log('✅ 테이블 생성 완료');
+                tablesReady = true;
+                return true;
+            } catch (createError) {
+                console.error('❌ 테이블 생성 재시도 실패:', createError.message);
+                console.error('오류 코드:', createError.code);
+                return false;
+            }
         }
     } catch (error) {
         console.error('❌ 테이블 존재 확인 중 오류:', error.message);
+        console.error('오류 상세:', error);
+        // 연결 오류가 아니면 테이블 생성 다시 시도
+        if (error.code !== 'ECONNREFUSED' && error.code !== 'ENOTFOUND') {
+            try {
+                await initializeTables();
+                return tablesReady;
+            } catch (createError) {
+                return false;
+            }
+        }
         return false;
     }
 }
