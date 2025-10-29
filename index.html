@@ -27,7 +27,10 @@
                 <li><a href="forum.html">💬 게시판</a></li>
             </ul>
             <div class="nav-actions">
-                <a href="auth.html" class="nav-btn login-btn">로그인</a>
+                <div id="login-buttons" style="display: flex; gap: 10px;">
+                    <a href="auth.html" class="nav-btn login-btn">로그인</a>
+                    <a href="auth.html?register=true" class="nav-btn register-btn">회원가입</a>
+                </div>
                 <span id="user-status" style="display: none;">
                     <span id="current-user" style="margin-right: 10px; color: #2563eb; font-weight: 600;"></span>
                     <button class="nav-btn logout-btn" onclick="handleLogout()">로그아웃</button>
@@ -331,9 +334,12 @@
                 const data = await response.json();
                 
                 if (data.loggedIn) {
-                    document.querySelector('.login-btn').parentElement.style.display = 'none';
+                    document.getElementById('login-buttons').style.display = 'none';
                     document.getElementById('user-status').style.display = 'block';
                     document.getElementById('current-user').textContent = data.username + '님';
+                } else {
+                    document.getElementById('login-buttons').style.display = 'flex';
+                    document.getElementById('user-status').style.display = 'none';
                 }
             } catch (error) {
                 console.log('인증 확인 중 오류:', error);

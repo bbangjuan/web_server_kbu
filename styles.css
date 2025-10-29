@@ -122,6 +122,17 @@ body {
     box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
 }
 
+.register-btn {
+    background: #e5e7eb;
+    color: #2563eb;
+    border: 2px solid #2563eb;
+}
+
+.register-btn:hover {
+    background: #f0f9ff;
+    transform: translateY(-2px);
+}
+
 .logout-btn {
     background: #e5e7eb;
     color: #374151;
