@@ -35,9 +35,19 @@ async function getPostsByUserId(userId) {
     return result.rows;
 }
 
+// 게시글 삭제
+async function deletePost(postId, userId) {
+    const result = await pool.query(
+        'DELETE FROM posts WHERE id = $1 AND user_id = $2 RETURNING id',
+        [postId, userId]
+    );
+    return result.rows[0] || null;
+}
+
 module.exports = {
     createPost,
     getAllPosts,
     getPostById,
-    getPostsByUserId
+    getPostsByUserId,
+    deletePost
 };

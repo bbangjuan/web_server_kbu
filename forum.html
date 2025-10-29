@@ -88,6 +88,21 @@
             color: #64748b;
             font-size: 0.9rem;
         }
+        .delete-btn {
+            background: #fee2e2;
+            color: #dc2626;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .delete-btn:hover {
+            background: #fecaca;
+            transform: translateY(-2px);
+        }
         .post-content {
             color: #475569;
             line-height: 1.6;
@@ -340,12 +355,15 @@
                     `;
                 } else {
                     postList.innerHTML = posts.map(post => `
-                        <div class="post-card" onclick="viewPost(${post.id})">
+                        <div class="post-card">
                             <div class="post-header">
-                                <div class="post-title">${post.title}</div>
-                                <div class="post-author">👤 ${post.username}</div>
+                                <div class="post-title" onclick="viewPost(${post.id})" style="cursor: pointer; flex: 1;">${post.title}</div>
+                                <div style="display: flex; gap: 10px; align-items: center;">
+                                    <div class="post-author">👤 ${post.username}</div>
+                                    ${post.user_id === currentUser.userId ? `<button class="delete-btn" onclick="deletePost(${post.id}, event)">삭제</button>` : ''}
+                                </div>
                             </div>
-                            <div class="post-content">${post.content}</div>
+                            <div class="post-content" onclick="viewPost(${post.id})" style="cursor: pointer;">${post.content}</div>
                             <div class="post-footer">
                                 <span>${formatDate(post.created_at)}</span>
                             </div>
@@ -472,6 +490,32 @@
                 }
             } catch (error) {
                 alert('댓글 작성에 실패했습니다.');
+            }
+        }
+
+        // 게시글 삭제
+        async function deletePost(postId, event) {
+            event.stopPropagation(); // 상위 요소의 클릭 이벤트 방지
+            
+            if (!confirm('정말 이 게시글을 삭제하시겠습니까?')) {
+                return;
+            }
+            
+            try {
+                const response = await fetch(`/api/posts/${postId}`, {
+                    method: 'DELETE'
+                });
+                const data = await response.json();
+                
+                if (response.ok) {
+                    alert(data.message);
+                    loadPosts();
+                } else {
+                    alert(data.error);
+                }
+            } catch (error) {
+                console.error('게시글 삭제 실패:', error);
+                alert('게시글 삭제에 실패했습니다.');
             }
         }
 

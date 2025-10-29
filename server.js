@@ -185,6 +185,30 @@ app.get('/api/posts/:id', async (req, res) => {
     }
 });
 
+// 게시글 삭제
+app.delete('/api/posts/:id', requireLogin, async (req, res) => {
+    const postId = req.params.id;
+    const userId = req.session.userId;
+    
+    try {
+        const post = await postModel.getPostById(postId);
+        if (!post) {
+            return res.status(404).json({ error: '게시글을 찾을 수 없습니다.' });
+        }
+        
+        // 작성자만 삭제할 수 있도록 확인
+        if (post.user_id !== userId) {
+            return res.status(403).json({ error: '본인이 작성한 게시글만 삭제할 수 있습니다.' });
+        }
+        
+        await postModel.deletePost(postId, userId);
+        res.json({ success: true, message: '게시글이 삭제되었습니다.' });
+    } catch (error) {
+        console.error('게시글 삭제 오류:', error);
+        res.status(500).json({ error: '게시글 삭제에 실패했습니다.' });
+    }
+});
+
 // 댓글 작성
 app.post('/api/posts/:id/comments', requireLogin, async (req, res) => {
     const postId = req.params.id;
