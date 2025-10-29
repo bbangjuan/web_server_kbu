@@ -196,13 +196,22 @@ initializeTables().catch(() => {
 
 // 테이블 준비 상태 확인 함수
 async function ensureTablesReady() {
-    if (tablesReady) return true;
+    console.log('[ensureTablesReady] 테이블 준비 상태 확인 시작...');
+    if (tablesReady) {
+        console.log('[ensureTablesReady] ✅ 테이블이 이미 준비되어 있습니다.');
+        return true;
+    }
     
+    console.log('[ensureTablesReady] 테이블이 준비되지 않음. 최대 10초 대기 중...');
     // 최대 10초간 대기 (더 긴 대기 시간)
     for (let i = 0; i < 100; i++) {
         await new Promise(resolve => setTimeout(resolve, 100));
-        if (tablesReady) return true;
+        if (tablesReady) {
+            console.log('[ensureTablesReady] ✅ 대기 중 테이블 준비 완료');
+            return true;
+        }
     }
+    console.log('[ensureTablesReady] ⚠️ 10초 대기 후에도 테이블이 준비되지 않음. 직접 확인 시도...');
     
     // 여전히 준비되지 않았다면 테이블 존재 여부 직접 확인 및 생성 시도
     try {
@@ -217,11 +226,11 @@ async function ensureTablesReady() {
         const tableExists = result.rows[0].exists;
         
         if (tableExists) {
-            console.log('✅ users 테이블이 존재합니다. 플래그를 업데이트합니다.');
+            console.log('[ensureTablesReady] ✅ users 테이블이 존재합니다. 플래그를 업데이트합니다.');
             tablesReady = true;
             return true;
         } else {
-            console.log('⚠️ users 테이블이 존재하지 않습니다. 테이블을 생성합니다...');
+            console.log('[ensureTablesReady] ⚠️ users 테이블이 존재하지 않습니다. 테이블을 생성합니다...');
             // 테이블이 없으면 직접 생성 시도
             try {
                 // initTables 함수 직접 실행
@@ -260,18 +269,20 @@ async function ensureTablesReady() {
                     )
                 `);
                 
-                console.log('✅ 테이블 생성 완료');
+                console.log('[ensureTablesReady] ✅ 테이블 생성 완료');
                 tablesReady = true;
                 return true;
             } catch (createError) {
-                console.error('❌ 테이블 생성 재시도 실패:', createError.message);
-                console.error('오류 코드:', createError.code);
+                console.error('[ensureTablesReady] ❌ 테이블 생성 재시도 실패:', createError.message);
+                console.error('[ensureTablesReady] 오류 코드:', createError.code);
+                console.error('[ensureTablesReady] 오류 상세:', createError);
                 return false;
             }
         }
     } catch (error) {
-        console.error('❌ 테이블 존재 확인 중 오류:', error.message);
-        console.error('오류 상세:', error);
+        console.error('[ensureTablesReady] ❌ 테이블 존재 확인 중 오류:', error.message);
+        console.error('[ensureTablesReady] 오류 코드:', error.code);
+        console.error('[ensureTablesReady] 오류 상세:', error);
         // 연결 오류가 아니면 테이블 생성 다시 시도
         if (error.code !== 'ECONNREFUSED' && error.code !== 'ENOTFOUND') {
             try {
