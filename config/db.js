@@ -69,8 +69,11 @@ async function initTables() {
         // 연결 확인
         const connectionTest = await pool.query('SELECT NOW()');
         console.log('✅ 데이터베이스 연결 성공:', connectionTest.rows[0].now);
+        console.log('📋 데이터베이스:', process.env.DB_DATABASE || process.env.POSTGRES_DATABASE || 'N/A');
+        console.log('👤 사용자:', process.env.DB_USER || process.env.POSTGRES_USER || 'N/A');
         
         // users 테이블
+        console.log('📝 users 테이블 생성 중...');
         await pool.query(`
             CREATE TABLE IF NOT EXISTS users (
                 id SERIAL PRIMARY KEY,
@@ -80,8 +83,10 @@ async function initTables() {
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
         `);
+        console.log('✅ users 테이블 생성 완료');
         
         // posts 테이블
+        console.log('📝 posts 테이블 생성 중...');
         await pool.query(`
             CREATE TABLE IF NOT EXISTS posts (
                 id SERIAL PRIMARY KEY,
@@ -93,8 +98,10 @@ async function initTables() {
                 FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
             )
         `);
+        console.log('✅ posts 테이블 생성 완료');
         
         // comments 테이블
+        console.log('📝 comments 테이블 생성 중...');
         await pool.query(`
             CREATE TABLE IF NOT EXISTS comments (
                 id SERIAL PRIMARY KEY,
@@ -107,6 +114,17 @@ async function initTables() {
                 FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
             )
         `);
+        console.log('✅ comments 테이블 생성 완료');
+        
+        // 테이블 존재 확인 (검증)
+        const verifyResult = await pool.query(`
+            SELECT table_name 
+            FROM information_schema.tables 
+            WHERE table_schema = 'public' 
+            AND table_name IN ('users', 'posts', 'comments')
+            ORDER BY table_name
+        `);
+        console.log('✅ 생성된 테이블 목록:', verifyResult.rows.map(r => r.table_name).join(', '));
         
         tablesReady = true;
         console.log('✅ 데이터베이스 테이블이 준비되었습니다.');
