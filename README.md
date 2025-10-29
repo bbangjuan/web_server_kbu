@@ -7,58 +7,61 @@
 - 📱 **자율주행 정보**: 자율주행의 개념, 작동 원리, 레벨, 장점, 주의사항 등 포괄적인 정보 제공
 - 💬 **게시판**: 사용자들이 자율주행에 대한 의견을 나눌 수 있는 커뮤니티
 - 🔐 **회원 시스템**: 로그인 및 회원가입 기능
-- 💾 **데이터베이스**: SQLite를 사용한 사용자 및 게시글 관리
+- 💾 **데이터베이스**: PostgreSQL을 사용한 사용자 및 게시글 관리 (Render 호환)
 
 ## 설치 및 실행
 
-### 1. MySQL 설치 및 설정
+### 1. PostgreSQL 설치 (로컬 개발용)
 
-MySQL이 설치되어 있어야 합니다. [MySQL 다운로드](https://dev.mysql.com/downloads/mysql/)
+**Render 배포**: Render에서는 PostgreSQL 데이터베이스가 자동으로 설정됩니다. `render.yaml` 파일을 참고하세요.
 
-**✨ 자동 생성 기능**: 서버를 시작하면 데이터베이스와 테이블이 **자동으로 생성**됩니다!
+**로컬 개발**: 로컬에서 개발하려면 PostgreSQL이 필요합니다.
+
+- Windows: [PostgreSQL 다운로드](https://www.postgresql.org/download/windows/)
+- Mac: `brew install postgresql`
+- Linux: `sudo apt-get install postgresql`
+
+**✨ 자동 생성 기능**: 서버를 시작하면 테이블이 **자동으로 생성**됩니다!
 
 #### 자동 생성 (권장)
-서버를 실행하면 자동으로 필요한 데이터베이스와 테이블이 생성됩니다:
+서버를 실행하면 자동으로 필요한 테이블이 생성됩니다:
 ```bash
 npm start
 ```
 
-#### 수동 생성 (선택사항)
-자동 생성이 실패할 경우 수동으로 생성할 수 있습니다:
-
-```bash
-mysql -u root -p
-```
-
-```sql
-CREATE DATABASE aicar_db;
-```
-
-또는 `.sql_database_setup.sql` 파일 실행:
-```bash
-mysql -u root -p < .sql_database_setup.sql
-```
-
 ### 2. 데이터베이스 연결 설정
 
-`.env` 파일을 생성하고 MySQL 연결 정보를 설정하세요:
+`.env` 파일을 생성하고 PostgreSQL 연결 정보를 설정하세요:
 
 ```bash
-# .env 파일 복사
+# .env 파일 복사 (있는 경우)
 cp .env.example .env
 
 # 또는 직접 .env 파일을 생성하고 다음과 같이 수정:
 ```
 
-`.env` 파일 내용:
+**로컬 개발용 `.env` 파일 내용:**
 ```env
 DB_HOST=localhost
-DB_USER=root
-DB_PASSWORD=your_mysql_password
+DB_USER=postgres
+DB_PASSWORD=your_postgres_password
 DB_DATABASE=aicar_db
+DB_PORT=5432
 PORT=3000
 SESSION_SECRET=your-super-secret-key-here
 ```
+
+**Render 배포용**: 
+Render에서는 자동으로 다음 환경 변수가 설정됩니다:
+- `POSTGRES_HOST`
+- `POSTGRES_USER`
+- `POSTGRES_PASSWORD`
+- `POSTGRES_DATABASE`
+- `POSTGRES_PORT`
+
+또는 Render 대시보드에서 다음 환경 변수를 설정할 수 있습니다:
+- `DB_HOST`, `DB_USER`, `DB_PASSWORD`, `DB_DATABASE`, `DB_PORT`
+- `DB_SSL=true` (Render에서는 SSL 연결 필요)
 
 **중요**: `.env` 파일은 Git에 올라가지 않습니다 (`.gitignore`에 포함).
 
@@ -129,7 +132,7 @@ Aicar/
 
 - **프론트엔드**: HTML, CSS, JavaScript
 - **백엔드**: Node.js, Express
-- **데이터베이스**: PostgreSQL (로컬/릴리스) + MySQL (옵션)
+- **데이터베이스**: PostgreSQL (Render 호환)
 - **인증**: Session 기반 인증, bcryptjs 비밀번호 해싱
 - **배포**: Render.com
 
@@ -155,7 +158,7 @@ Aicar/
 🚗 **인터랙티브**: 자동차 애니메이션, 부드러운 스크롤, 카드 효과
 🔒 **안전한 인증**: bcryptjs를 사용한 비밀번호 해싱
 💬 **실시간 커뮤니티**: 사용자 간 의견 교환 가능
-🗄️ **MySQL 데이터베이스**: 안정적이고 확장 가능한 데이터 관리
+🗄️ **PostgreSQL 데이터베이스**: Render 호환, 안정적이고 확장 가능한 데이터 관리
 📦 **모듈화된 구조**: 코드 분리 및 유지보수성 향상
 
 ## 개발 정보

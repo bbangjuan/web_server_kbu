@@ -51,9 +51,10 @@ app.post('/api/register', async (req, res) => {
         await userModel.createUser(username, email, password);
         res.json({ success: true, message: '회원가입이 완료되었습니다.' });
     } catch (error) {
-        if (error.code === 'ER_DUP_ENTRY') {
+        if (error.code === '23505') { // PostgreSQL unique constraint violation
             return res.status(400).json({ error: '이미 존재하는 사용자명 또는 이메일입니다.' });
         }
+        console.error('회원가입 오류:', error);
         res.status(500).json({ error: '서버 오류가 발생했습니다.' });
     }
 });
