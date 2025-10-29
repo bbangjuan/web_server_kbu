@@ -5,11 +5,20 @@ async function createUser(username, email, password) {
     // 테이블이 준비될 때까지 대기
     const ready = await ensureTablesReady();
     if (!ready) {
-        throw new Error('데이터베이스 테이블이 아직 준비되지 않았습니다. 잠시 후 다시 시도해주세요.');
+        const error = new Error('데이터베이스 테이블이 아직 준비되지 않았습니다. 잠시 후 다시 시도해주세요.');
+        error.code = '42P01'; // table does not exist
+        throw error;
     }
     
     const bcrypt = require('bcryptjs');
-    const hashedPassword = await bcrypt.hash(password, 10);
+    let hashedPassword;
+    
+    try {
+        hashedPassword = await bcrypt.hash(password, 10);
+    } catch (hashError) {
+        console.error('비밀번호 해싱 오류:', hashError);
+        throw new Error('비밀번호 처리 중 오류가 발생했습니다.');
+    }
     
     try {
         const result = await pool.query(
@@ -17,9 +26,19 @@ async function createUser(username, email, password) {
             [username, email, hashedPassword]
         );
         
+        if (!result || !result.rows || !result.rows[0]) {
+            throw new Error('회원가입은 완료되었지만 사용자 ID를 가져올 수 없습니다.');
+        }
+        
         return result.rows[0].id;
     } catch (error) {
-        // 에러를 다시 던져서 상위에서 처리하도록
+        // PostgreSQL 에러는 그대로 전달
+        console.error('사용자 생성 중 데이터베이스 오류:', {
+            code: error.code,
+            message: error.message,
+            detail: error.detail,
+            constraint: error.constraint
+        });
         throw error;
     }
 }

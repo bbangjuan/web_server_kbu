@@ -69,13 +69,32 @@ app.post('/api/register', async (req, res) => {
         }
         
         // 다른 에러들
-        console.error('회원가입 오류:', error);
+        console.error('='.repeat(50));
+        console.error('회원가입 오류 상세 정보:');
         console.error('에러 코드:', error.code);
         console.error('에러 메시지:', error.message);
+        console.error('에러 상세:', error.detail || 'N/A');
+        console.error('제약 조건:', error.constraint || 'N/A');
         console.error('에러 스택:', error.stack);
+        console.error('='.repeat(50));
         
-        // 에러 메시지에 데이터베이스 관련 정보가 포함되어 있으면 그대로 반환
-        const errorMessage = error.message || '서버 오류가 발생했습니다.';
+        // 사용자에게 보여줄 메시지 결정
+        let errorMessage = '서버 오류가 발생했습니다.';
+        
+        if (error.message) {
+            // 일반적인 데이터베이스 오류 메시지 필터링
+            if (error.message.includes('테이블') || error.message.includes('table')) {
+                errorMessage = '데이터베이스 테이블 오류가 발생했습니다. 잠시 후 다시 시도해주세요.';
+            } else if (error.message.includes('연결') || error.message.includes('connection')) {
+                errorMessage = '데이터베이스 연결 오류가 발생했습니다.';
+            } else {
+                // 개발 환경에서만 상세 메시지 표시
+                errorMessage = process.env.NODE_ENV === 'development' 
+                    ? error.message 
+                    : '서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.';
+            }
+        }
+        
         res.status(500).json({ error: errorMessage });
     }
 });

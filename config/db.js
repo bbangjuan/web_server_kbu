@@ -145,13 +145,34 @@ initTables().catch(err => {
 async function ensureTablesReady() {
     if (tablesReady) return true;
     
-    // 최대 5초간 대기
-    for (let i = 0; i < 50; i++) {
+    // 최대 10초간 대기 (더 긴 대기 시간)
+    for (let i = 0; i < 100; i++) {
         await new Promise(resolve => setTimeout(resolve, 100));
         if (tablesReady) return true;
     }
     
-    return false;
+    // 여전히 준비되지 않았다면 테이블 존재 여부 직접 확인
+    try {
+        const result = await pool.query(`
+            SELECT EXISTS (
+                SELECT FROM information_schema.tables 
+                WHERE table_name = 'users'
+            );
+        `);
+        const tableExists = result.rows[0].exists;
+        
+        if (tableExists) {
+            console.log('⚠️ 테이블은 존재하지만 플래그가 설정되지 않았습니다. 플래그를 업데이트합니다.');
+            tablesReady = true;
+            return true;
+        } else {
+            console.error('❌ users 테이블이 존재하지 않습니다.');
+            return false;
+        }
+    } catch (error) {
+        console.error('❌ 테이블 존재 확인 중 오류:', error.message);
+        return false;
+    }
 }
 
 // 쿼리 헬퍼 함수 (모델에서 사용)
