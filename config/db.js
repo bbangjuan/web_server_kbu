@@ -177,22 +177,46 @@ async function initializeTables() {
     return initTablesPromise;
 }
 
-// 테이블 초기화 완료를 기다리는 함수 (서버 시작 전에 호출)
-async function waitForTablesReady() {
-    try {
-        await initializeTables();
-        console.log('✅ 테이블 초기화 완료 - 서버 시작 준비 완료');
+// 테이블이 완전히 준비될 때까지 대기하는 함수
+async function waitForTablesCompletelyReady() {
+    if (tablesReady) {
         return true;
+    }
+    
+    try {
+        console.log('🔄 테이블 초기화 대기 중...');
+        await initializeTables();
+        
+        // 최대 15초 더 대기 (테이블이 실제로 준비될 때까지)
+        const maxWait = 15000;
+        const start = Date.now();
+        
+        while (!tablesReady && (Date.now() - start) < maxWait) {
+            await new Promise(resolve => setTimeout(resolve, 200));
+        }
+        
+        if (tablesReady) {
+            console.log('✅ 테이블 초기화 완료 확인됨');
+            return true;
+        } else {
+            console.warn('⚠️ 테이블 초기화 대기 시간 초과');
+            return false;
+        }
     } catch (err) {
-        console.error('⚠️ 테이블 초기화 실패 - 서버는 시작되지만 테이블이 준비되지 않을 수 있습니다');
+        console.error('❌ 테이블 초기화 대기 실패:', err.message);
         return false;
     }
 }
 
-// 서버 시작 시 즉시 테이블 초기화 시도 (비동기)
-initializeTables().catch(() => {
-    // 에러는 이미 initTables에서 로그되었음
-});
+// 서버 시작 시 즉시 테이블 초기화 시도 (비동기, 하지만 더 적극적으로)
+(async () => {
+    try {
+        await initializeTables();
+    } catch (err) {
+        // 에러는 이미 initTables에서 로그되었음
+        // 실패해도 계속 시도
+    }
+})();
 
 // 테이블 준비 상태 확인 함수
 async function ensureTablesReady() {
@@ -306,4 +330,9 @@ pool.queryWithParams = async (text, params) => {
     }
 };
 
-module.exports = { pool, ensureTablesReady, waitForTablesReady, tablesReady: () => tablesReady };
+module.exports = { 
+    pool, 
+    ensureTablesReady, 
+    waitForTablesCompletelyReady,
+    tablesReady: () => tablesReady 
+};

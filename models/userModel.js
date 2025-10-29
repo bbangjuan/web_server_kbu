@@ -2,13 +2,32 @@ const { pool, ensureTablesReady } = require('../config/db');
 
 // 회원가입
 async function createUser(username, email, password) {
-    // 테이블이 준비될 때까지 대기
-    const ready = await ensureTablesReady();
+    // 테이블이 준비될 때까지 대기 (더 적극적으로)
+    console.log('[createUser] 회원가입 시도 - 테이블 준비 확인 중...');
+    
+    let ready = await ensureTablesReady();
+    
+    // 준비되지 않았다면 최대 3번 더 재시도
     if (!ready) {
+        console.log('[createUser] 테이블이 준비되지 않음. 재시도 중...');
+        for (let i = 0; i < 3; i++) {
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            ready = await ensureTablesReady();
+            if (ready) {
+                console.log('[createUser] 재시도 성공 - 테이블 준비 완료');
+                break;
+            }
+        }
+    }
+    
+    if (!ready) {
+        console.error('[createUser] ❌ 테이블 준비 실패 - 회원가입 불가');
         const error = new Error('데이터베이스 테이블이 아직 준비되지 않았습니다. 잠시 후 다시 시도해주세요.');
         error.code = '42P01'; // table does not exist
         throw error;
     }
+    
+    console.log('[createUser] ✅ 테이블 준비 완료 - 회원가입 진행');
     
     const bcrypt = require('bcryptjs');
     let hashedPassword;
