@@ -215,9 +215,61 @@ app.get('/api/posts/:id/comments', async (req, res) => {
     }
 });
 
-// 서버 시작 (Render 호환)
-const server = app.listen(PORT, '0.0.0.0', () => {
-    console.log(`🚀 서버가 포트 ${PORT}에서 실행 중입니다.`);
-    console.log(`📡 http://localhost:${PORT}`);
-    console.log(`💾 PostgreSQL 데이터베이스 연결 대기 중...`);
+// 서버 시작 전 테이블 초기화 대기 (Render 배포 환경 고려)
+const { waitForTablesReady } = require('./config/db');
+
+// 헬스 체크 엔드포인트 추가 (Render에서 사용)
+app.get('/health', async (req, res) => {
+    try {
+        const { pool, tablesReady } = require('./config/db');
+        await pool.query('SELECT 1');
+        const ready = tablesReady(); // 함수 호출
+        res.status(ready ? 200 : 503).json({ 
+            status: ready ? 'healthy' : 'initializing',
+            tablesReady: ready 
+        });
+    } catch (error) {
+        res.status(503).json({ 
+            status: 'unhealthy',
+            error: error.message 
+        });
+    }
 });
+
+// 서버 시작 (Render 호환)
+async function startServer() {
+    // Render 환경에서는 테이블 초기화 완료까지 최대 10초 대기
+    const isRender = process.env.RENDER || process.env.NODE_ENV === 'production';
+    
+    if (isRender) {
+        console.log('🔧 Render 배포 환경 감지 - 테이블 초기화 완료까지 대기 중...');
+        const { tablesReady: getTablesReady } = require('./config/db');
+        const maxWaitTime = 10000; // 10초
+        const startTime = Date.now();
+        
+        while (!getTablesReady() && (Date.now() - startTime) < maxWaitTime) {
+            await new Promise(resolve => setTimeout(resolve, 500));
+        }
+        
+        if (getTablesReady()) {
+            console.log('✅ 테이블 초기화 완료 - 서버 시작');
+        } else {
+            console.log('⚠️ 테이블 초기화 대기 시간 초과 - 서버 시작 (나중에 자동 재시도됨)');
+        }
+    }
+    
+    const server = app.listen(PORT, '0.0.0.0', () => {
+        const { tablesReady: getTablesReady } = require('./config/db');
+        console.log(`🚀 서버가 포트 ${PORT}에서 실행 중입니다.`);
+        console.log(`📡 http://localhost:${PORT}`);
+        if (getTablesReady()) {
+            console.log(`💾 PostgreSQL 데이터베이스 준비 완료`);
+        } else {
+            console.log(`💾 PostgreSQL 데이터베이스 연결 대기 중...`);
+        }
+    });
+    
+    return server;
+}
+
+const server = startServer();

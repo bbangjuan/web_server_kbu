@@ -159,7 +159,19 @@ async function initializeTables() {
     return initTablesPromise;
 }
 
-// 서버 시작 시 즉시 테이블 초기화
+// 테이블 초기화 완료를 기다리는 함수 (서버 시작 전에 호출)
+async function waitForTablesReady() {
+    try {
+        await initializeTables();
+        console.log('✅ 테이블 초기화 완료 - 서버 시작 준비 완료');
+        return true;
+    } catch (err) {
+        console.error('⚠️ 테이블 초기화 실패 - 서버는 시작되지만 테이블이 준비되지 않을 수 있습니다');
+        return false;
+    }
+}
+
+// 서버 시작 시 즉시 테이블 초기화 시도 (비동기)
 initializeTables().catch(() => {
     // 에러는 이미 initTables에서 로그되었음
 });
@@ -265,4 +277,4 @@ pool.queryWithParams = async (text, params) => {
     }
 };
 
-module.exports = { pool, ensureTablesReady, tablesReady: () => tablesReady };
+module.exports = { pool, ensureTablesReady, waitForTablesReady, tablesReady: () => tablesReady };
